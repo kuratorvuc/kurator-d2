@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мониторинг состояния военнослужащего</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .status-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .status-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .status-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+        .status-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+        .temp { color: #e74c3c; }
+        .pressure { color: #3498db; }
+        .altitude { color: #2ecc71; }
+        .timestamp {
+            text-align: center;
+            margin-top: 20px;
+            color: #95a5a6;
+            font-size: 12px;
+        }
+        .refresh-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto 0;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Физиологические показатели</h1>
+        
+        <div class="status-container">
+            <div class="status-card">
+                <div class="status-label">Температура</div>
+                <div class="status-value temp" id="temp">--</div>
+                <div class="status-label">°C</div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-label">Давление</div>
+                <div class="status-value pressure" id="pressure">--</div>
+                <div class="status-label">мм рт. ст.</div>
+            </div>
+            
+            <div class="status-card">
+                <div class="status-label">Высота</div>
+                <div class="status-value altitude" id="altitude">--</div>
+                <div class="status-label">метров</div>
+            </div>
+        </div>
+        
+        <div class="timestamp" id="timestamp">Последнее обновление: --</div>
+        
+        <button class="refresh-btn" onclick="fetchData()">Обновить данные</button>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('/data');
+                const data = await response.json();
+                
+                // Обновляем данные на странице
+                document.getElementById('temp').textContent = data.temp;
+                document.getElementById('pressure').textContent = data.pressure;
+                document.getElementById('altitude').textContent = data.altitude;
+                
+                // Обновляем timestamp
+                const now = new Date();
+                document.getElementById('timestamp').textContent = 
+                    `Последнее обновление: ${now.toLocaleTimeString()}`;
+                
+            } catch (error) {
+                console.error('Ошибка при получении данных:', error);
+                alert('Не удалось получить данные. Проверьте соединение.');
+            }
+        }
+        
+        // Загружаем данные сразу при открытии страницы
+        document.addEventListener('DOMContentLoaded', fetchData);
+        
+        // Автообновление каждые 5 секунд
+        setInterval(fetchData, 5000);
+    </script>
+</body>
+</html>
